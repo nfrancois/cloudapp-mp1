@@ -1,5 +1,8 @@
-import java.io.File;
-import java.lang.reflect.Array;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -19,6 +22,7 @@ public class MP1 {
             "further", "then", "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each",
             "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than",
             "too", "very", "s", "t", "can", "will", "just", "don", "should", "now"};
+
 
     void initialRandomGenerator(String seed) throws NoSuchAlgorithmException {
         MessageDigest messageDigest = MessageDigest.getInstance("SHA");
@@ -50,11 +54,75 @@ public class MP1 {
     }
 
     public String[] process() throws Exception {
-        String[] ret = new String[20];
-       
-        //TODO
+        List<String> lines = readFile();
+        List<String> words = flatMapByTokens(lines);
+        List<String> filteredWords = filterWord(words);
+        Map<String, Integer> tuples = countAsMap(filteredWords);
+        List<Map.Entry<String, Integer>> ordered = orderByValue(tuples);
+        List<Map.Entry<String, Integer>> firsts = ordered.subList(0, 20);
+        List<String> top20 = mapToWords(firsts);
+        return top20.toArray(new String[20]);
+    }
 
-        return ret;
+    private List<String> readFile() throws IOException {
+        Path path = Paths.get(inputFileName);
+        return Files.readAllLines(path, Charset.defaultCharset());
+    }
+
+    private List<String> flatMapByTokens(List<String> lines){
+        List<String> tokens = new ArrayList<>();
+        for(String line : lines){
+            StringTokenizer st = new StringTokenizer(line, delimiters);
+            while(st.hasMoreTokens()) {
+                tokens.add(st.nextToken().toLowerCase());
+            }
+        }
+        return tokens;
+    }
+
+    private List<Map.Entry<String, Integer>> orderByValue(Map<String, Integer> tuples){
+        List<Map.Entry<String, Integer>> ordered = new ArrayList<>();
+        ordered.addAll(tuples.entrySet());
+        Comparator<Map.Entry<String, Integer>> sortByValue = new Comparator<Map.Entry<String, Integer>>() {
+
+            @Override
+            public int compare(final Map.Entry<String, Integer> left, final Map.Entry<String, Integer> right) {
+                return right.getValue().compareTo(left.getValue());
+            }
+        };
+        Collections.sort(ordered, sortByValue);
+        return ordered;
+    }
+
+    private List<String> mapToWords(final List<Map.Entry<String, Integer>> firsts) {
+        List<String> words = new ArrayList<>();
+        for(Map.Entry<String, Integer> entry : firsts){
+            words.add(entry.getKey());
+        }
+        return words;
+    }
+
+    private List<String> filterWord(List<String> words){
+        List<String> stopWords = Arrays.asList(stopWordsArray);
+        List<String> filtered = new ArrayList<>();
+        for(String word : words) {
+            if(!stopWords.contains(word)){
+                filtered.add(word);
+            }
+        }
+        return filtered;
+    }
+
+    private Map<String, Integer> countAsMap(List<String> words){
+        Map<String, Integer> counts = new HashMap<>();
+        for(String word : words){
+            if(!counts.containsKey(word)){
+                counts.put(word, 1);
+            } else {
+                counts.put(word, counts.get(word)+1);
+            }
+        }
+        return counts;
     }
 
     public static void main(String[] args) throws Exception {
