@@ -55,13 +55,22 @@ public class MP1 {
 
     public String[] process() throws Exception {
         List<String> lines = readFile();
-        List<String> words = flatMapByTokens(lines);
+        List<String> selectionedLines = ramdomFilter(lines);
+        List<String> words = flatMapByTokens(selectionedLines);
         List<String> filteredWords = filterWord(words);
         Map<String, Integer> tuples = countAsMap(filteredWords);
         List<Map.Entry<String, Integer>> ordered = orderByValue(tuples);
         List<Map.Entry<String, Integer>> firsts = ordered.subList(0, 20);
         List<String> top20 = mapToWords(firsts);
         return top20.toArray(new String[20]);
+    }
+
+    private List<String> ramdomFilter(final List<String> lines) throws NoSuchAlgorithmException {
+        List<String> selectedLines = new ArrayList<>();
+        for(int index : getIndexes()){
+            selectedLines.add(lines.get(index));
+        }
+        return selectedLines;
     }
 
     private List<String> readFile() throws IOException {
@@ -114,7 +123,7 @@ public class MP1 {
     }
 
     private Map<String, Integer> countAsMap(List<String> words){
-        Map<String, Integer> counts = new HashMap<>();
+        Map<String, Integer> counts = new TreeMap<>();
         for(String word : words){
             if(!counts.containsKey(word)){
                 counts.put(word, 1);
