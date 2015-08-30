@@ -8,7 +8,7 @@ public class MP1 {
     Random generator;
     String userName;
     String inputFileName;
-    String delimiters = " \t,;.?!-:@[](){}_*/";
+    String delimiters = " \t,;.?!-:@[](){}_*/&";
     String[] stopWordsArray = {"i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours",
             "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its",
             "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that",
